@@ -1,0 +1,14 @@
+From: Jordan Lee <jordan.lee@example.com>
+To: support@example.com
+Date: Sun, 25 Oct 2026 09:30:00 +0530
+Subject: Urgent: possible data breach involving my account
+
+Hello Support,
+
+I noticed that another person may have accessed my account, and some of my
+personal information may have been exposed. I am concerned this could be a
+data breach. Please have a member of your team review this urgently and tell
+me what steps I should take to secure my account.
+
+Thank you,
+Jordan

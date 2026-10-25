@@ -1,0 +1,7 @@
+From: Ana Silva <ana.silva@example.com>
+To: support@example.com
+Date: Thu, 22 Oct 2026 11:20:00 +0530
+Subject: Thank you for the quick help
+
+Thanks for helping me update my account details. The support was excellent and
+I really appreciate the quick response.

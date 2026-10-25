@@ -1,0 +1,13 @@
+From: Priya Shah <priya.shah@example.com>
+To: support@example.com
+Date: Sun, 25 Oct 2026 10:15:00 +0530
+Subject: Possible fraud on my account
+
+Hello Support,
+
+I found a payment on my account that I do not recognize. I am worried it may
+be fraud. Please have a person review the transaction and explain how I can
+dispute it. I have not included any payment card details in this message.
+
+Best,
+Priya
