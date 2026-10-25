@@ -108,10 +108,6 @@ def main() -> None:
         if uploaded_emails
         else _sample_emails()
     )
-    st.caption(
-        f"{len(emails)} email(s) ready — "
-        + ("uploaded files" if uploaded_emails else "bundled sample inbox")
-    )
 
     with st.form("run_agent"):
         run_workflow = st.form_submit_button("Prioritize, draft, and schedule")

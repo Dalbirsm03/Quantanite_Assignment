@@ -82,7 +82,7 @@ class EmailAutomationAgent:
 
     @classmethod
     def from_gemini(
-        cls, api_key: str, model_name: str = "gemini-2.5-flash"
+        cls, api_key: str, model_name: str = "gemini-3.1-flash-lite"
     ) -> "EmailAutomationAgent":
         if not api_key.strip():
             raise ValueError("A Gemini API key is required to enable Gemini.")
