@@ -177,12 +177,35 @@ class EmailAutomationTests(unittest.TestCase):
                     "id": "normal.txt",
                     "subject": "Account question",
                     "body": "Please update my account.",
+                    "confidence": 0.8,
                 },
             ]
         }
         reviews = review_emails(state)["draft_reviews"]
         self.assertTrue(reviews[0]["review_required"])
         self.assertIn("legal", reviews[0]["review_reason"])
+        self.assertFalse(reviews[1]["review_required"])
+
+    def test_review_flags_confidence_below_sixty_percent(self):
+        state = {
+            "drafts": [
+                {
+                    "id": "low-confidence.txt",
+                    "subject": "Billing question",
+                    "body": "Please help with my payment.",
+                    "confidence": 0.56,
+                },
+                {
+                    "id": "at-threshold.txt",
+                    "subject": "Billing question",
+                    "body": "Please help with my payment.",
+                    "confidence": 0.60,
+                },
+            ]
+        }
+        reviews = review_emails(state)["draft_reviews"]
+        self.assertTrue(reviews[0]["review_required"])
+        self.assertIn("56%", reviews[0]["review_reason"])
         self.assertFalse(reviews[1]["review_required"])
 
     def test_sample_files_are_readable(self):
@@ -193,6 +216,13 @@ class EmailAutomationTests(unittest.TestCase):
         results = EmailAutomationAgent().run(emails)
         self.assertTrue(
             all(0 <= item["confidence"] <= 1 for item in results)
+        )
+        self.assertTrue(
+            all(
+                item["review_required"]
+                for item in results
+                if item["confidence"] < 0.60
+            )
         )
         self.assertTrue(
             any(item["review_reason"].startswith("Sensitive topic") for item in results)

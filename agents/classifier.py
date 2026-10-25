@@ -21,8 +21,6 @@ CATEGORY_WORDS = {
     "technical support": ("login", "access", "error", "broken"),
     "account support": ("account", "profile", "password", "subscription"),
 }
-CONFIDENCE_READY_THRESHOLD = 0.80
-CONFIDENCE_REVIEW_THRESHOLD = 0.60
 
 
 class EmailClassification(BaseModel):

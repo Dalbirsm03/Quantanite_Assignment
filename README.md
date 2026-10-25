@@ -70,6 +70,7 @@ Workflow progress and errors are logged to the console at INFO level.
 ### Confidence score
 
 The app averages keyword-match scores for sentiment, urgency, and category.
+Scores below 60% are flagged for human review.
 
 
 ## Project layout
