@@ -46,7 +46,7 @@ following flow:
 
 1. **`EmailClassifierAgent` (`classifier_agent`)** uses structured Gemini
    output when enabled. Offline, simple keyword rules estimate sentiment and
-   urgency. No confidence score is produced.
+   urgency. Both modes attach keyword-evidence scores to each classification.
 2. **`prioritizer`** is plain Python. High urgency is P1, otherwise negative
    sentiment is P2, and the remaining emails are P3.
 3. **`EmailDraftingAgent` (`drafting_agent`)** asks Gemini to write an
@@ -67,8 +67,10 @@ The shared state schema is in `state.py`; the graph is compiled and invoked by
 flags, proposed dispatch times, and the graph flow.
 Workflow progress and errors are logged to the console at INFO level.
 
-The drafter can use the first two examples from the supplied response history;
-no vector database or embedding-based RAG is needed for this demo.
+### Confidence score
+
+The app averages keyword-match scores for sentiment, urgency, and category.
+
 
 ## Project layout
 

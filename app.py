@@ -45,6 +45,7 @@ def _csv_export(results: list[dict[str, Any]]) -> str:
         "subject",
         "sentiment",
         "urgency",
+        "confidence",
         "category",
         "priority",
         "review_required",
@@ -55,7 +56,9 @@ def _csv_export(results: list[dict[str, Any]]) -> str:
     writer = csv.DictWriter(output, fieldnames=fields)
     writer.writeheader()
     for item in results:
-        writer.writerow({field: item[field] for field in fields})
+        row = {field: item[field] for field in fields}
+        row["confidence"] = f"{item['confidence']:.0%}"
+        writer.writerow(row)
     return output.getvalue()
 
 
@@ -145,6 +148,7 @@ def main() -> None:
             "Subject": item["subject"],
             "Sentiment": item["sentiment"].title(),
             "Urgency": item["urgency"].title(),
+            "Confidence": f"{item['confidence']:.0%}",
             "Proposed dispatch": item["proposed_dispatch"],
             "Review needed": "Yes" if item["review_required"] else "No",
         }
@@ -160,6 +164,7 @@ def main() -> None:
                 f"**Classification:** {item['sentiment']} sentiment · "
                 f"{item['urgency']} urgency · {item['category']}"
             )
+            st.write(f"**Confidence score:** {item['confidence']:.0%}")
             st.write(f"**Reason:** {item['rationale']}")
             if item["review_required"]:
                 st.warning(f"Please review this email: {item['review_reason']}")

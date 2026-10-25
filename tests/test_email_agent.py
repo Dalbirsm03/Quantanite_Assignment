@@ -49,6 +49,9 @@ class EmailAutomationTests(unittest.TestCase):
         self.assertEqual(results[1]["proposed_dispatch"], "2026-10-24T09:00")
         self.assertIn("Hello B", results[0]["draft"])
         self.assertTrue(all("review_required" in result for result in results))
+        self.assertTrue(
+            all(0 <= result["confidence"] <= 1 for result in results)
+        )
 
     def test_high_urgency_is_p1_even_without_negative_sentiment(self):
         email = parse_email_file(
@@ -61,6 +64,29 @@ class EmailAutomationTests(unittest.TestCase):
         self.assertEqual(result["urgency"], "high")
         self.assertEqual(result["sentiment"], "neutral")
         self.assertEqual(result["priority"], "P1 - High")
+        self.assertGreaterEqual(result["confidence"], 0)
+        self.assertLessEqual(result["confidence"], 1)
+
+    def test_confidence_increases_with_matching_keyword_evidence(self):
+        from agents.classifier import calculate_confidence
+
+        classification = {
+            "urgency": "high",
+            "sentiment": "negative",
+            "category": "billing",
+        }
+        vague_email = {
+            "subject": "Question",
+            "body": "Can you help me?",
+        }
+        clear_email = {
+            "subject": "Urgent billing issue",
+            "body": "I have a payment problem and need help today.",
+        }
+        self.assertGreater(
+            calculate_confidence(clear_email, classification),
+            calculate_confidence(vague_email, classification),
+        )
 
     def test_graph_has_separate_agent_nodes_and_shared_state(self):
         agent = EmailAutomationAgent()
@@ -94,9 +120,12 @@ class EmailAutomationTests(unittest.TestCase):
     def test_scheduler_proposes_time_based_on_priority(self):
         state = {
             "draft_reviews": [
-                {"id": "p1", "review_required": False, "review_reason": ""},
-                {"id": "p2", "review_required": False, "review_reason": ""},
-                {"id": "p3", "review_required": False, "review_reason": ""},
+                {
+                    "id": f"p{i}",
+                    "review_required": False,
+                    "review_reason": "",
+                }
+                for i in range(1, 4)
             ],
             "drafts": [
                 {
@@ -133,6 +162,8 @@ class EmailAutomationTests(unittest.TestCase):
         )
         result = EmailAutomationAgent().run([email])[0]
         self.assertEqual(result["proposed_dispatch"], "2026-10-23T14:30+05:30")
+        self.assertGreaterEqual(result["confidence"], 0)
+        self.assertLessEqual(result["confidence"], 1)
 
     def test_review_flags_sensitive_emails_without_retry(self):
         state = {
@@ -156,7 +187,16 @@ class EmailAutomationTests(unittest.TestCase):
 
     def test_sample_files_are_readable(self):
         sample_dir = Path(__file__).parents[1] / "samples" / "inbox"
-        self.assertGreaterEqual(len(list(sample_dir.glob("*.eml"))) + len(list(sample_dir.glob("*.txt"))), 2)
+        files = sorted(sample_dir.glob("*.eml")) + sorted(sample_dir.glob("*.txt"))
+        self.assertGreaterEqual(len(files), 2)
+        emails = [parse_email_file(path.name, path.read_bytes()) for path in files]
+        results = EmailAutomationAgent().run(emails)
+        self.assertTrue(
+            all(0 <= item["confidence"] <= 1 for item in results)
+        )
+        self.assertTrue(
+            any(item["review_reason"].startswith("Sensitive topic") for item in results)
+        )
 
 
 if __name__ == "__main__":
